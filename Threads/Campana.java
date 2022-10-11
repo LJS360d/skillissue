@@ -1,5 +1,11 @@
 package Threads;
 
+/**
+ * Available at
+ * {@link https://github.com/LJS360d/skillissue/tree/master/Threads}
+ * 
+ * @author Luca Lencioni
+ */
 public class Campana implements Runnable {
     private static final int DEFAULT_TIMES = 3;
     private String sound;
