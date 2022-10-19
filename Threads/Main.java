@@ -8,12 +8,12 @@ public class Main {
     public static void main(String[] args) {
         System.out.print("\033[H\033[2J");
         System.out.flush();
-        randomizer(5);
+        randomizer(10);
     }
 
     public static void randomizer(int threads) {
 
-        if (threads >= Factorial.RANGE) {
+        if (threads > Factorial.RANGE) {
             throw new IndexOutOfBoundsException(
                     "\n No duplicates idiot, Number of Threads must be under or equal to RANGE");
         }
