@@ -1,6 +1,4 @@
-package Threads;
-
-import org.w3c.dom.ranges.Range;
+package Threads.Fattoriali.src;
 
 public class Factorial extends Thread {
     public static final int RANGE = 10;
@@ -21,7 +19,7 @@ public class Factorial extends Thread {
             matrixInsert();
             System.out.println(matrix[0][index - 1] + " -> " + matrix[1][index - 1]);
             try {
-                Thread.sleep(100);
+                Thread.sleep(5);
             } catch (Exception e) {
 
             }
