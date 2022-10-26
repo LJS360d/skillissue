@@ -9,7 +9,46 @@ public class Container extends ThreadGroup {
 
     public void insert(Thread... toInsert) {
         for (Thread thread : toInsert) {
-            storage.add(thread);
+            if (!storage.contains(thread)) {
+                storage.add(thread);
+            } else {
+                System.err.println(thread.getName() + " is already in storage");
+            }
+        }
+    }
+
+    public Thread getByName(String name) {
+        for (Thread thread : storage) {
+            if (thread.getName() == name) {
+                return thread;
+            }
+        }
+        return null;
+    }
+
+    public void interruptByName(String name) {
+        for (Thread thread : storage) {
+            if (thread.getName() == name) {
+                thread.interrupt();
+            }
+        }
+    }
+
+    public void joinByName(String name) throws InterruptedException {
+        for (Thread thread : storage) {
+            if (thread.getName() == name) {
+                thread.join();
+            }
+        }
+    }
+
+    public void removeByName(String name) throws InterruptedException {
+        for (Thread thread : storage) {
+            if (thread.getName() == name) {
+                storage.remove(thread);
+                thread.interrupt();
+                thread.join();
+            }
         }
     }
 
@@ -27,13 +66,9 @@ public class Container extends ThreadGroup {
         }
     }
 
-    public void joinAll() {
+    public void joinAll() throws InterruptedException {
         for (Thread thread : storage) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                System.err.println("Kitammurt");
-            }
+            thread.join();
         }
     }
 
