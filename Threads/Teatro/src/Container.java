@@ -72,5 +72,10 @@ public class Container extends ThreadGroup {
             thread.join();
         }
     }
-
+    public boolean isEmpty(){
+        if(this.storage.size()==0){
+            return true;
+        }
+        return false;
+    }
 }
