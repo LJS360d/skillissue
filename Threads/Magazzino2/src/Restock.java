@@ -20,31 +20,33 @@ public class Restock extends Thread {
 
     @Override
     public void run() {
-        for (int i = 0; i < PRODUCT_AMOUNT; i++) {
-            for (String string : products) {
-                synchronized (Magazzino.class) {
-                    while (!Magazzino.shifting) {
-                        try {
-                            Magazzino.class.wait();
-                        } catch (Exception e) {
-                            return;
+        while (true) {
+            for (int i = 0; i < PRODUCT_AMOUNT; i++) {
+                for (String string : products) {
+                    synchronized (Magazzino.class) {
+                        while (!Magazzino.shifting) {
+                            try {
+                                Magazzino.class.wait();
+                            } catch (Exception e) {
+                                return;
+                            }
                         }
-                    }
-                    if (string != null) {
-                        if (Magazzino.addToProduct(string)) {
-                            Magazzino.shifting = false;
-                            Magazzino.class.notifyAll();
-                            System.out.println(this.getName() + ":Ho Aggiunto 1 di->" + string + "," +
-                                    +Magazzino.getProductByName(string).quantity + " Rimasta");
-                        } else {
-                            Magazzino.shifting = false;
-                            Magazzino.class.notifyAll();
-                            Magazzino.checkOutOfStock();
+                        if (string != null) {
+                            if (Magazzino.addToProduct(string)) {
+                                Magazzino.shifting = false;
+                                Magazzino.class.notifyAll();
+                                System.out.println(this.getName() + ":Ho Aggiunto 1 di->" + string + "," +
+                                        +Magazzino.getProductByName(string).quantity + " Rimasta");
+                            } else {
+                                Magazzino.shifting = false;
+                                Magazzino.class.notifyAll();
+                                Magazzino.checkOutOfStock();
+                            }
                         }
                     }
                 }
             }
+            System.out.println(this.getName() + ":Io torno a casa");
         }
-        System.out.println(this.getName() + ":Io torno a casa");
     }
 }

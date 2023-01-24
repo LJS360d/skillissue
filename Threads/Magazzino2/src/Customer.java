@@ -21,32 +21,35 @@ public class Customer extends Thread {
 
     @Override
     public void run() {
-        for (int i = 0; i < PRODUCT_AMOUNT; i++) {
-            for (String string : products) {
-                synchronized (Magazzino.class) {
-                    while (Magazzino.shifting) {
-                        try {
-                            Magazzino.class.wait();
-                        } catch (Exception e) {
-                            return;
+        while (true) {
+
+            for (int i = 0; i < PRODUCT_AMOUNT; i++) {
+                for (String string : products) {
+                    synchronized (Magazzino.class) {
+                        while (Magazzino.shifting) {
+                            try {
+                                Magazzino.class.wait();
+                            } catch (Exception e) {
+                                return;
+                            }
                         }
-                    }
-                    if (string != null) {
-                        if (Magazzino.popProduct(string) >= 0) {
-                            Magazzino.shifting = true;
-                            Magazzino.class.notifyAll();
-                            System.out.println(this.getName() + ":Ho Comprato 1 di->" + string + "," +
-                                    +Magazzino.getProductByName(string).quantity + " Rimasta");
-                            this.debit += Magazzino.getProductByName(string).price;
-                        } else {
-                            Magazzino.shifting = true;
-                            Magazzino.class.notifyAll();
-                            Magazzino.checkOutOfStock();
+                        if (string != null) {
+                            if (Magazzino.popProduct(string) >= 0) {
+                                Magazzino.shifting = true;
+                                Magazzino.class.notifyAll();
+                                System.out.println(this.getName() + ":Ho Comprato 1 di->" + string + "," +
+                                        +Magazzino.getProductByName(string).quantity + " Rimasta");
+                                this.debit += Magazzino.getProductByName(string).price;
+                            } else {
+                                Magazzino.shifting = true;
+                                Magazzino.class.notifyAll();
+                                Magazzino.checkOutOfStock();
+                            }
                         }
                     }
                 }
             }
+            System.out.println(this.getName() + ":Ho speso $" + debit);
         }
-        System.out.println(this.getName() + ":Ho speso $" + debit);
     }
 }
