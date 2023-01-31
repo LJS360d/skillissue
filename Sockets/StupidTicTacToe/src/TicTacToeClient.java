@@ -11,7 +11,8 @@ public class TicTacToeClient {
     private static String[] board = { " ", " ", " ", " ", " ", " ", " ", " ", " " };
 
     public static void main(String[] args) {
-        try (final Socket socket = new Socket(ADDRESS, PORT); final Scanner scanner = new Scanner(System.in)) {
+        try (final Socket socket = new Socket(ADDRESS, PORT);
+                final Scanner scanner = new Scanner(System.in)) {
             InputStream is = socket.getInputStream();
             OutputStream os = socket.getOutputStream();
             DataInputStream dis = new DataInputStream(is);
