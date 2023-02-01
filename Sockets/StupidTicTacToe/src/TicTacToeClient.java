@@ -43,7 +43,7 @@ public class TicTacToeClient {
                     System.out.println(result);
                     Thread.sleep(1500);
                     resetBoard();
-                    Runtime.getRuntime().exec("cls");
+                    
                 }
             }
 
