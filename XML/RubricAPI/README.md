@@ -20,7 +20,7 @@ GET /RubricAPI/api?format=json&limit=10
 ## POST
 
 Il metodo POST accetta dati in formato JSON, XML o x-www-form-urlencoded nel corpo della richiesta e inserisce un nuovo record nel database dei contatti se i dati forniti sono validi.
-```json
+```
 POST /RubricAPI/api
  
 Content-Type: application/json 
@@ -61,7 +61,7 @@ Content-Type: application/xml
 </contact>
 ```
   
-```json
+```
 PUT /RubricAPI/api?id=1 
 
 Content-Type: application/xml 
