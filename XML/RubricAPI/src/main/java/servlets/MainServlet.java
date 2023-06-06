@@ -20,29 +20,43 @@ public class MainServlet extends HttpServlet {
     DBService dbs = new DBService();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
-    throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         try {
+            resp.setStatus(HttpServletResponse.SC_OK);
             String format = req.getParameter("format");
+            String limitParam = req.getParameter("limit");
+            int limit = 0;
+            if (limitParam != null)
+                limit = Integer.parseInt(limitParam);
+            if (limit > 0) {
+                if (format != null && format.equalsIgnoreCase("xml")) {
+                    resp.setContentType("application/xml");
+                    resp.getWriter().println(dbs.getAllContactsXML(limit));
+                } else {
+                    resp.setContentType("application/json");
+                    resp.getWriter().println(dbs.getAllContactsJSON(limit));
+                }
+                return;
+            }
 
             if (format != null && format.equalsIgnoreCase("xml")) {
                 resp.setContentType("application/xml");
-                resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().println(dbs.getAllContactsXML());
             } else {
                 resp.setContentType("application/json");
-                resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().println(dbs.getAllContactsJSON());
             }
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println("Request Failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
-    throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         String contentType = req.getContentType();
         if (contentType == null) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -137,10 +151,10 @@ public class MainServlet extends HttpServlet {
         }
     }
 
-    private void handleXMLPost(HttpServletRequest req, HttpServletResponse resp) 
-    throws ServletException,IOException {
+    private void handleXMLPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         resp.setContentType("application/xml");
-    
+
         try {
             // Read the XML data from the request body
             XMLHelper xmh = new XMLHelper();
@@ -148,12 +162,12 @@ public class MainServlet extends HttpServlet {
             xmh.doc = xmh.parseXMLData(requestData);
             // Extract the required fields from XML
             Element contactElement = xmh.doc.getDocumentElement();
-            
+
             String name = xmh.getElementText(contactElement, "name");
             String surname = xmh.getElementText(contactElement, "surname");
             String prefix = xmh.getElementText(contactElement, "prefix");
             String number = xmh.getElementText(contactElement, "number");
-    
+
             // Validate the required fields
             if (name.isEmpty() || surname.isEmpty() || prefix.isEmpty() || number.isEmpty()) {
                 // Send HTTP 400 Bad Request if any required field is missing
@@ -161,10 +175,10 @@ public class MainServlet extends HttpServlet {
                 resp.getWriter().println("Missing required fields");
                 return;
             }
-    
+
             // Execute the SQL statement to insert the record
             int rowsAffected = dbs.insertContactRecord(name, surname, prefix, number);
-    
+
             if (rowsAffected > 0) {
                 // If the record was inserted successfully
                 resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -184,10 +198,10 @@ public class MainServlet extends HttpServlet {
             resp.getWriter().println("Database error: " + e.getMessage());
         }
     }
-    
+
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) 
-    throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         String idParam = req.getParameter("id");
         if (idParam == null || idParam.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -262,27 +276,27 @@ public class MainServlet extends HttpServlet {
 
     protected void handleXMLPut(HttpServletRequest req, HttpServletResponse resp, int id)
             throws ServletException, IOException {
-                resp.setContentType("application/json");
-    
+        resp.setContentType("application/json");
+
         try {
             // Read the XML data from the request body
             XMLHelper xmh = new XMLHelper();
             String requestData = xmh.readRequestData(req);
             xmh.doc = xmh.parseXMLData(requestData);
-        
+
             // Extract the required fields from XML
             Element rootElement = xmh.doc.getDocumentElement();
             NodeList contactNodes = rootElement.getElementsByTagName("contact");
             if (contactNodes.getLength() == 0) {
                 throw new IllegalArgumentException("No <contact> element found in XML");
             }
-    
+
             Element contactElement = (Element) contactNodes.item(0);
             String name = xmh.getElementText(contactElement, "name");
             String surname = xmh.getElementText(contactElement, "surname");
             String prefix = xmh.getElementText(contactElement, "prefix");
             String number = xmh.getElementText(contactElement, "number");
-    
+
             // Validate the required fields
             if (name.isEmpty() || surname.isEmpty() || prefix.isEmpty() || number.isEmpty()) {
                 // Send HTTP 400 Bad Request if any required field is missing
@@ -290,10 +304,10 @@ public class MainServlet extends HttpServlet {
                 resp.getWriter().println("Missing required fields");
                 return;
             }
-    
+
             // Execute the SQL statement to update the record
             int rowsAffected = dbs.updateContactRecord(name, surname, prefix, number, id);
-    
+
             if (rowsAffected > 0) {
                 // If the record was updated successfully
                 resp.setStatus(HttpServletResponse.SC_OK);
@@ -315,8 +329,8 @@ public class MainServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) 
-    throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         resp.setContentType("application/json");
 
         try {

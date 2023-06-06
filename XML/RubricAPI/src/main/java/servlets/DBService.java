@@ -29,6 +29,22 @@ public class DBService {
         }
     }
 
+    public String getAllContactsJSON(int limit) throws SQLException {
+        ResultSet res = this.stmt.executeQuery("SELECT * FROM contacts LIMIT " + limit);
+        JSONArray contactsArray = new JSONArray();
+
+        while (res.next()) {
+            JSONObject contact = new JSONObject();
+            contact.put("name", res.getString("name"));
+            contact.put("surname", res.getString("surname"));
+            contact.put("prefix", res.getString("prefix"));
+            contact.put("number", res.getString("number"));
+            contactsArray.put(contact);
+        }
+
+        return contactsArray.toString();
+    }
+
     public String getAllContactsJSON() throws SQLException {
         ResultSet res = this.stmt.executeQuery("SELECT * FROM contacts");
         JSONArray contactsArray = new JSONArray();
@@ -45,6 +61,28 @@ public class DBService {
         return contactsArray.toString();
     }
 
+    public String getAllContactsXML(int limit) throws SQLException {
+        ResultSet res = this.stmt.executeQuery("SELECT * FROM contacts LIMIT " + limit);
+
+        try {
+            XMLHelper xmh = new XMLHelper();
+            Element contactsElement = xmh.createContactsElement(xmh.doc);
+            xmh.doc.appendChild(contactsElement);
+
+            while (res.next()) {
+                Element contactElement = xmh.createContactElement(xmh.doc, contactsElement);
+                xmh.createContactAttributeElements(xmh.doc, contactElement, res);
+            }
+
+            return xmh.transformDocumentToString(xmh.doc);
+        } catch (ParserConfigurationException | TransformerConfigurationException e) {
+            e.printStackTrace();
+            throw new SQLException("Failed to create XML document");
+        } catch (TransformerException e) {
+            e.printStackTrace();
+            throw new SQLException("Failed to transform XML document to string");
+        }
+    }
     public String getAllContactsXML() throws SQLException {
         ResultSet res = this.stmt.executeQuery("SELECT * FROM contacts");
 
